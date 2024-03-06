@@ -6,19 +6,21 @@ if($_SERVER['REQUEST_METHOD'] == "POST") {
     $password = $_POST['password'];
 
     if(!empty($email) && !empty($password) && !is_numeric($email)) {
-        $query = "select * from form where email = '$email' limit 1";
+        $query = "select * from form where email = '$email' and password='$password'";
         $result = mysqli_query($con,$query);
-
-        if($result) {
-            if($result && mysqli_num_rows($result) > 0 ) {
-                $user_data = mysqli_fetch_assoc($result);
-                if($user_data['password'] == $password) {
-                    header("location : index.php");
-                    die;
-
-                }
-            }
+        $row = mysqli_fetch_array($result,MYSQLI_ASSOC);
+        $count = mysqli_num_rows($result);
+        if($count==1) {
+            header("Location:index.html");
         }
+        else {
+            echo '<script>
+                window.location.href = "index.html";
+                alert("Login failed . Invalid username or password!!")
+                </script>';
+        }
+
+        
         echo "<script type='text/javascript'> alert('wrong username or password ') </script>";
     }
     else {
@@ -48,4 +50,3 @@ if($_SERVER['REQUEST_METHOD'] == "POST") {
 
 </body>
 </html>
-
