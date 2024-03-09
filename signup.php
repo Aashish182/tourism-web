@@ -10,14 +10,21 @@ if($_SERVER['REQUEST_METHOD'] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    if(!empty($email) && !empty($password) && !is_numeric($email)) {
-        $query="INSERT INTO `form` (`id`, `firstname`, `lastname`, `gender`, `contact`, `city`, `email`, `password`) VALUES
-        (NULL, '$firstname', '$lastname', '$gender', '$contact', '$city', '$email', '$password')";
-        mysqli_query($con,$query);
-        echo "<script type='text/javascript'> alert('Successfully Register') </script>";
-    }
-    else {
-        echo "<script type='text/javascript'> alert('Please entered correct value') </script>";
+    $existSql = "select * from `form` where email = '$email'";
+    $result = mysqli_query($con, $existSql);
+    $exist = mysqli_num_rows($result);
+    if($exist > 0){
+        echo "<script type='text/javascript'> alert('Gmail Already exist !!') </script>";
+    }else{
+        if(!empty($email) && !empty($password) && !is_numeric($email)) {
+            $query="INSERT INTO `form` (`id`, `firstname`, `lastname`, `gender`, `contact`, `city`, `email`, `password`) VALUES
+            (NULL, '$firstname', '$lastname', '$gender', '$contact', '$city', '$email', '$password')";
+            mysqli_query($con,$query);
+            echo "<script type='text/javascript'> alert('Successfully Register') </script>";
+        }
+        else {
+            echo "<script type='text/javascript'> alert('Please entered correct value') </script>";
+        }
     }
 }
 
