@@ -22,28 +22,74 @@ if (isset($_POST['submit'])) {
         $error = true;
 	}
 	
-    $sql = "select * from users where email = '$email'";
+    $sql = "select * from book where email = '$email'";
 	$result = mysqli_query($conn,$sql);
 	if (mysqli_num_rows($result) > 0) {
 		$email_err = "Email already exists";
 		$error = true;
     }
+    
 	if (!$error) {
 		
 		
 		$sql = "insert into book (firstname,middlename,lastname,gender,contact,address,email,code,guest) values ('$firstname','$middlename','$lastname','$gender','$contact','$address','$email','$code','$guest')";
 		
 		$result = mysqli_query($conn,$sql);
-		if ($result)
-			echo'<script> alert("Booking Successful") </script>';
-            header("location:index2.php");
+        
+        // if ($result) {
+        //     $sql = "select * from trip where code= ?";
+	    //     $stmt = $conn->prepare($sql);
+	    //     $stmt->bind_param("ss", $code);
+	    //     if ($stmt->execute()){
+		//         $result = $stmt->get_result();
+		//         if ($result->num_rows >0) {
+		// 	        $row = $result->fetch_assoc();
+		// 	        $_SESSION['tripname'] = $row['tripname'];
+		// 	        $_SESSION['prize'] = $row['prize'];
+			
+		//         }
+		//         else 
+		// 	        $err_msg = "Incorrect trip code";
+	    //     }
+	    //     else 
+		//         $err_msg = "Some Error occurred";
+        // }
+
+        if ($result) {
+        $sql = "select * from book INNER JOIN trip ON book.code = trip.code where book.email = ? and book.firstname = ? and trip.code=? ";
+	    $stmt = $conn->prepare($sql);
+	    $stmt->bind_param("sss", $email, $firstname,$code);
+	    if ($stmt->execute()){
+		    $result = $stmt->get_result();
+		    if ($result->num_rows >0) {
+			    $row = $result->fetch_assoc();
+			    $_SESSION['firstname'] = $row['firstname'];
+			    $_SESSION['code'] = $row['code'];
+                $_SESSION['tripname'] = $row['tripname'];
+			    $_SESSION['prize'] = $row['prize'];
+                $_SESSION['middlename'] = $row['middlename'];
+                $_SESSION['lastname'] = $row['lastname'];
+                $_SESSION['contact'] = $row['contact'];
+                $_SESSION['email'] = $row['email'];
+                header("location:recipt.php");
+                exit();
+		    }
+		    else 
+			    $err_msg = "Incorrect Email id/name";
+	    }
+	    else 
+		    $err_msg = "Some Error occurred";
+        
+		}
+        
     }
 		else
         {
 			$err_msg = "Error in Booking";
 		}
-	}
-	?>	
+    
+    }
+?>
 
 
 <!DOCTYPE html>
@@ -61,11 +107,11 @@ if (isset($_POST['submit'])) {
         <h2> And Get Extra Bonus </h2> 
         <form method="POST">
             <label> First name </label>
-            <input type="text" name="firstname" placeholder="Enter First Name" Required>
+            <input type="text" name="firstname" placeholder="Enter First Name" Required><br>
             <label> Middle name </label>
-            <input type="text" name="middlename" placeholder="Enter Middle Name" Required>
+            <input type="text" name="middlename" placeholder="Enter Middle Name" Required><br>
             <label> Last name </label>
-            <input type="text" name="lastname" placeholder="Enter Last Name" Required>
+            <input type="text" name="lastname" placeholder="Enter Last Name" Required><br>
             <span>
             <label>
             <input type="radio" name="gender" value="male">Male</label>
@@ -73,17 +119,17 @@ if (isset($_POST['submit'])) {
             <input type="radio" name="gender" value="female">Female</label>
             <label>
             <input type="radio" name="gender" value="other">Other</label>
-            </span>
+            </span><br>
             <label> Contact </label>
-            <input type="tel" pattern="[0-9]{10}" maxlength="10" name="contact" Required>
+            <input type="tel" pattern="[0-9]{10}" maxlength="10" name="contact" Required><br>
             <label> Address </label>
-            <input type="text" name="address" placeholder="Address" Required>
+            <input type="text" name="address" placeholder="Address" Required><br>
             <label> Email </label>
-            <input type="email" name="email" placeholder="Email" Required>
+            <input type="email" name="email" placeholder="Email" Required><br>
             <label> Enter trip code </label>
-            <input type="" name="code" placeholder="Enter trip code" Required>
+            <input type="" name="code" placeholder="Enter trip code" Required><br>
             <label> Total number of guests </label>
-            <input type="number" name="guest" placeholder="Number Of Guests" Required>
+            <input type="number" name="guest" placeholder="Number Of Guests" Required><br>
             <label for="date">Date:</label>
             <input type="date" id="date" name="date">
 
